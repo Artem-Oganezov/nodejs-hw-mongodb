@@ -6,46 +6,32 @@ import {
   getContactById,
   updateContact,
 } from '../services/contacts.js';
+import { createHttpError } from 'http-errors';
 
 export const getContactsController = async (req, res, next) => {
-  try {
-    const data = await getAllContacts();
-    res.json({
-      message: 'Successfully found contacts!',
-      status: 200,
-      data,
-    });
-  } catch (error) {
-    next(error);
-  }
+  const data = await getAllContacts();
+  res.json({
+    message: 'Successfully found contacts!',
+    status: 200,
+    data,
+  });
 };
 
 export const getContactByIdController = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    if (!isValidObjectId(contactId)) {
-      return res.status(404).json({
-        status: 404,
-        message: 'Contact not found',
-      });
-    }
-    const contact = await getContactById(contactId);
-
-    if (!contact) {
-      return res.status(404).json({
-        message: 'Contact not found',
-        status: 404,
-      });
-    }
-
-    res.json({
-      message: `Successfully found contact with id ${contactId}!`,
-      status: 200,
-      data: contact,
-    });
-  } catch (error) {
-    next(error);
+  const { contactId } = req.params;
+  if (!isValidObjectId(contactId)) {
+    throw createHttpError(404, 'Contact not found');
   }
+
+  const contact = await getContactById(contactId);
+  if (!contact) {
+    throw createHttpError(404, 'Contact not found');
+  }
+  res.json({
+    message: `Successfully found contact with id ${contactId}!`,
+    status: 200,
+    data: contact,
+  });
 };
 
 export const addContactController = async (req, res) => {
