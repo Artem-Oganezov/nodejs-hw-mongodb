@@ -2,17 +2,14 @@ import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 
-export const getAllContacts = async ({
-  page,
-  perPage,
-  sortBy,
-  sortOrder,
-  filter,
-}) => {
+export const getAllContacts = async (
+  contactUserId,
+  { page, perPage, sortBy, sortOrder, filter },
+) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = Contact.find();
+  const contactsQuery = Contact.find({ userId: contactUserId });
 
   if (filter.type) {
     contactsQuery.where('contactType').equals(filter.type);
@@ -21,7 +18,7 @@ export const getAllContacts = async ({
     contactsQuery.where('isFavourite').equals(filter.isFavourite);
   }
 
-  const contactsCount = await Contact.find()
+  const contactsCount = await Contact.find({ userId: contactUserId })
     .merge(contactsQuery)
     .countDocuments();
 
@@ -39,8 +36,8 @@ export const getAllContacts = async ({
   };
 };
 
-export const getContactById = async (contactId) => {
-  return await Contact.findById(contactId);
+export const getContactById = async (contactUserId, contactId) => {
+  return await Contact.findOne({ _id: contactId, userId: contactUserId });
 };
 
 export const addContact = async (contactData) => {
@@ -48,17 +45,24 @@ export const addContact = async (contactData) => {
 };
 
 export const updateContact = async (contactId, contactData) => {
-  const contact = await Contact.findByIdAndUpdate(contactId, contactData, {
-    new: true,
-  });
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, userId: contactData.userId },
+    contactData,
+    {
+      new: true,
+    },
+  );
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
   }
   return contact;
 };
 
-export const deleteContact = async (contactId) => {
-  const contact = await Contact.findByIdAndDelete(contactId);
+export const deleteContact = async (contactUserId, contactId) => {
+  const contact = await Contact.findOneAndDelete({
+    _id: contactId,
+    userId: contactUserId,
+  });
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
   }

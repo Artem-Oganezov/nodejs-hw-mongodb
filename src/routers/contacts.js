@@ -12,8 +12,11 @@ import {
   updateContactSchema,
 } from '../validation/contacts.js';
 import { isValidId } from '../middlewares/isValidId.js';
+import { authenticate } from '../middlewares/authenticate.js';
 
 const contactsRouter = Router();
+
+contactsRouter.use('/contacts', authenticate);
 
 contactsRouter.use('/contacts/:contactId', isValidId);
 
