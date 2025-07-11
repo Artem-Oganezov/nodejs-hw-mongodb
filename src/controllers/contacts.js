@@ -5,6 +5,7 @@ import {
   getAllContacts,
   getContactById,
   updateContact,
+  uploadContactsPhoto,
 } from '../services/contacts.js';
 import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
@@ -54,6 +55,20 @@ export const addContactController = async (req, res) => {
     message: 'Successfully added contact!',
     status: 201,
     data: newContact,
+  });
+};
+
+export const uploadContactsPhotoController = async (req, res) => {
+  const { contactId } = req.params;
+  if (!req.file) {
+    throw createHttpError(400, 'File not found!');
+  }
+  const contact = await uploadContactsPhoto(req.user._id, contactId, req.file);
+
+  return res.json({
+    message: `Successfully updated contacts avatar with id ${contactId}!`,
+    status: 200,
+    data: contact,
   });
 };
 

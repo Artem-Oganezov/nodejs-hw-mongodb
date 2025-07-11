@@ -12,6 +12,12 @@ const contactSchema = new Schema(
       type: String,
       required: true,
     },
+    photo: {
+      type: String,
+      default:
+        'https://res.cloudinary.com/dcurebdmg/image/upload/v1752140816/avatar-default-icon_pzlntl.png',
+      required: false,
+    },
     phoneNumber: {
       type: String,
       required: true,

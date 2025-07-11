@@ -1,6 +1,7 @@
 import createHttpError from 'http-errors';
 import { Contact } from '../db/models/contact.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
+import { saveFileToCloudinary } from '../utils/saveFile.js';
 
 export const getAllContacts = async (
   contactUserId,
@@ -66,5 +67,18 @@ export const deleteContact = async (contactUserId, contactId) => {
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
   }
+  return contact;
+};
+
+export const uploadContactsPhoto = async (contactUserId, contactId, file) => {
+  const url = await saveFileToCloudinary(file);
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, userId: contactUserId },
+    {
+      photo: url,
+    },
+    { new: true },
+  );
+
   return contact;
 };
