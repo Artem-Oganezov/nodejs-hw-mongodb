@@ -5,7 +5,6 @@ import {
   getAllContacts,
   getContactById,
   updateContact,
-  uploadContactsPhoto,
 } from '../services/contacts.js';
 import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
@@ -50,7 +49,16 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const addContactController = async (req, res) => {
-  const newContact = await addContact({ userId: req.user._id, ...req.body });
+  const contactData = {
+    userId: req.user._id,
+    ...req.body,
+  };
+
+  if (req.file) {
+    contactData.photo = req.file.path;
+  }
+
+  const newContact = await addContact(contactData);
   return res.status(201).json({
     message: 'Successfully added contact!',
     status: 201,
@@ -58,28 +66,19 @@ export const addContactController = async (req, res) => {
   });
 };
 
-export const uploadContactsPhotoController = async (req, res) => {
-  const { contactId } = req.params;
-  if (!req.file) {
-    throw createHttpError(400, 'File not found!');
-  }
-  const contact = await uploadContactsPhoto(req.user._id, contactId, req.file);
-
-  return res.json({
-    message: `Successfully updated contacts avatar with id ${contactId}!`,
-    status: 200,
-    data: contact,
-  });
-};
-
 export const updateContactController = async (req, res, next) => {
-  const { contactId } = req.params;
-  const contact = await updateContact(contactId, {
+  const contactData = {
     userId: req.user._id,
     ...req.body,
-  });
+  };
+
+  if (req.file) {
+    contactData.photo = req.file.path;
+  }
+
+  const contact = await updateContact(req.params.contactId, contactData);
   return res.status(200).json({
-    message: `Successfully updated contact with id ${contactId}!`,
+    message: `Successfully updated contact with id ${req.params.contactId}!`,
     status: 200,
     data: contact,
   });

@@ -14,8 +14,7 @@ const contactSchema = new Schema(
     },
     photo: {
       type: String,
-      default:
-        'https://res.cloudinary.com/dcurebdmg/image/upload/v1752140816/avatar-default-icon_pzlntl.png',
+      default: null,
       required: false,
     },
     phoneNumber: {

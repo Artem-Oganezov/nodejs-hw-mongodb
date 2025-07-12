@@ -1,13 +1,12 @@
 import multer from 'multer';
-import { TEMP_UPLOAD_DIR } from '../constants/paths.js';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { cloudinary } from '../utils/cloudinary.js';
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, TEMP_UPLOAD_DIR);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now();
-    cb(null, uniqueSuffix + '-' + file.originalname);
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'avatar',
+    allowed_formats: ['jpg', 'jpeg', 'png'],
   },
 });
 

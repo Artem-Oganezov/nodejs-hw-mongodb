@@ -5,7 +5,6 @@ import {
   getContactByIdController,
   getContactsController,
   updateContactController,
-  uploadContactsPhotoController,
 } from '../controllers/contacts.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import {
@@ -25,19 +24,17 @@ contactsRouter.use('/contacts/:contactId', isValidId);
 contactsRouter.get('/contacts', getContactsController);
 
 contactsRouter.get('/contacts/:contactId', getContactByIdController);
-contactsRouter.patch(
-  '/contacts/:contactId/uploadPhoto',
-  upload.single('photoUrl'),
-  uploadContactsPhotoController,
-);
+
 contactsRouter.post(
   '/contacts',
+  upload.single('photo'),
   validateBody(createContactSchema),
   addContactController,
 );
 
 contactsRouter.patch(
   '/contacts/:contactId',
+  upload.single('photo'),
   validateBody(updateContactSchema),
   updateContactController,
 );
